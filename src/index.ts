@@ -1,7 +1,8 @@
 import { Processor, type Reader, type Writer } from "@rdfc/js-runner";
+import { reason } from "eyeling";
 
-export type TemplateArgs = {
-    reader: Reader;
+export type EyelingArgs = {
+    reader: Array<Reader>;
     writer: Writer;
 };
 
@@ -13,12 +14,14 @@ export type TemplateArgs = {
  * @param incoming The data stream which must be logged.
  * @param outgoing The data stream into which the incoming stream is written.
  */
-export class TemplateProcessor extends Processor<TemplateArgs> {
+export class EyelingProcessor extends Processor<EyelingArgs> {
+    private sourcesAsStrings: Array<string>;
+
     /**
      * This is the first function that is called (and awaited) when creating a processor.
      * This is the perfect location to start things like database connections.
      */
-    async init(this: TemplateArgs & this): Promise<void> {
+    async init(this: EyelingArgs & this): Promise<void> {
         // Initialization code here e.g., setting up connections or loading resources
     }
 
@@ -27,25 +30,36 @@ export class TemplateProcessor extends Processor<TemplateArgs> {
      * This function is called for each processor before `produce` is called.
      * Listen to the incoming stream, log them, and push them to the outgoing stream.
      */
-    async transform(this: TemplateArgs & this): Promise<void> {
-        // Consume the incoming stream, log each message, and push it to the outgoing stream.
-        for await (const msg of this.reader.strings()) {
-            this.logger.info(msg);
-            await this.writer.string(msg);
+    async transform(this: EyelingArgs & this): Promise<void> {
+        this.sourcesAsStrings = [];
+
+        for (let i = 0; i < this.reader.length; i++) {
+            this.logger.info("Processing reader " + i);
+            const reader = this.reader[i];
+            let sourceAsString = "";
+
+            for await (const msg of reader.strings()) {
+                this.logger.info(msg);
+                sourceAsString += msg + "\n";
+            }
+
+            this.sourcesAsStrings.push(sourceAsString);
+            this.logger.info("Done processing reader " + i);
         }
 
-        // Close the outgoing stream when done
-        await this.writer.close();
-        this.logger.debug(
-            "TemplateProcessor finished processing. Writer closed.",
+        const output = reason(
+            {},
+            {
+                sources: this.sourcesAsStrings,
+            },
         );
+
+        await this.writer.string(output);
     }
 
     /**
      * Function to start the production of data, starting the pipeline.
      * This function is called after all processors are completely set up.
      */
-    async produce(this: TemplateArgs & this): Promise<void> {
-        // Function to start the production of data, starting the pipeline.
-    }
+    async produce(this: EyelingArgs & this): Promise<void> {}
 }

@@ -1,4 +1,4 @@
-# template-processor-ts
+# eyeling-processor-ts
 
 [![Build and tests with Node.js](https://github.com/rdf-connect/template-processor-ts/actions/workflows/build-test.yml/badge.svg)](https://github.com/rdf-connect/template-processor-ts/actions/workflows/build-test.yml)
 
@@ -42,16 +42,16 @@ First, install the dependencies using the following command:
 npm install
 ```
 
-You can run the tests using:
-
-```bash
-npm test
-```
-
 You can build the project using:
 
 ```bash
 npm run build
+```
+
+You can run the tests using:
+
+```bash
+npm test
 ```
 
 ### Logging
