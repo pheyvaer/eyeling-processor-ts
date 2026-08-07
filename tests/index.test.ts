@@ -25,7 +25,7 @@ describe("Functional tests for the Eyeling processor", () => {
         const startEyelingProcessor = <FullProc<EyelingProcessor>>(
             new EyelingProcessor(
                 {
-                    sources: [inputReader1, inputReader2],
+                    reader: [inputReader1, inputReader2],
                     writer: outputWriter,
                 },
                 createLogger(),
