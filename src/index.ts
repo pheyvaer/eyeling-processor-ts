@@ -15,8 +15,6 @@ export type EyelingArgs = {
  * @param outgoing The data stream into which the incoming stream is written.
  */
 export class EyelingProcessor extends Processor<EyelingArgs> {
-    private sourcesAsStrings: Array<string>;
-
     /**
      * This is the first function that is called (and awaited) when creating a processor.
      * This is the perfect location to start things like database connections.
@@ -31,30 +29,25 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
      * Listen to the incoming stream, log them, and push them to the outgoing stream.
      */
     async transform(this: EyelingArgs & this): Promise<void> {
-        this.sourcesAsStrings = [];
+        const promises = [];
 
         for (let i = 0; i < this.reader.length; i++) {
             this.logger.info("Processing reader " + i);
             const reader = this.reader[i];
-            let sourceAsString = "";
-
-            for await (const msg of reader.strings()) {
-                this.logger.info(msg);
-                sourceAsString += msg + "\n";
-            }
-
-            this.sourcesAsStrings.push(sourceAsString);
-            this.logger.info("Done processing reader " + i);
+            promises.push(this.streamToEye(reader));
         }
+
+        const sourcesAsStrings = await Promise.all(promises);
 
         const output = reason(
             {},
             {
-                sources: this.sourcesAsStrings,
+                sources: sourcesAsStrings,
             },
         );
 
         await this.writer.string(output);
+        await this.writer.close();
     }
 
     /**
@@ -62,4 +55,15 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
      * This function is called after all processors are completely set up.
      */
     async produce(this: EyelingArgs & this): Promise<void> {}
+
+    async streamToEye(reader: Reader): Promise<string> {
+        let sourceAsString = "";
+
+        for await (const msg of reader.strings()) {
+            this.logger.info(msg);
+            sourceAsString += msg + "\n";
+        }
+
+        return sourceAsString;
+    }
 }
