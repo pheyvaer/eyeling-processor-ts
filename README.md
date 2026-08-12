@@ -3,6 +3,9 @@
 [![Build and tests with Node.js](https://github.com/pheyvaer/eyeling-processor-ts/actions/workflows/build-test.yml/badge.svg)](https://github.com/pheyvaer/eyeling-processor-ts/actions/workflows/build-test.yml)
 
 TypeScript RDF-Connect processor for [Eyeling](https://github.com/eyereasoner/eyeling).
+It only supports Eyeling's [reason function](https://github.com/eyereasoner/eyeling/#reasonoptions-input) 
+with [multi-source input](https://github.com/eyereasoner/eyeling/#multi-source-input).
+At the moment, the processor only supports the default options. 
 
 ## Production usage
 
