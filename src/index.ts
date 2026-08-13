@@ -2,8 +2,9 @@ import { Processor, type Reader, type Writer } from "@rdfc/js-runner";
 import { reason } from "eyeling";
 
 export type EyelingArgs = {
-    reader: Array<Reader>;
-    writer: Writer;
+  input: Array<Reader>;
+  rules: Reader;
+  writer: Writer;
 };
 
 /**
@@ -15,55 +16,59 @@ export type EyelingArgs = {
  * @param outgoing The data stream into which the incoming stream is written.
  */
 export class EyelingProcessor extends Processor<EyelingArgs> {
-    /**
-     * This is the first function that is called (and awaited) when creating a processor.
-     * This is the perfect location to start things like database connections.
-     */
-    async init(this: EyelingArgs & this): Promise<void> {
-        // Initialization code here e.g., setting up connections or loading resources
-    }
+  private rulesAsString: string;
+  private dataAsStrings: Array<string>;
 
-    /**
-     * Function to start reading channels.
-     * This function is called for each processor before `produce` is called.
-     * Listen to the incoming stream, log them, and push them to the outgoing stream.
-     */
-    async transform(this: EyelingArgs & this): Promise<void> {
-        const promises = [];
+  /**
+   * This is the first function that is called (and awaited) when creating a processor.
+   * This is the perfect location to start things like database connections.
+   */
+  async init(this: EyelingArgs & this): Promise<void> {}
 
-        for (let i = 0; i < this.reader.length; i++) {
-            this.logger.info("Processing reader " + i);
-            const reader = this.reader[i];
-            promises.push(this.streamToEye(reader));
-        }
+  /**
+   * Function to start reading channels.
+   * This function is called for each processor before `produce` is called.
+   * Listen to the incoming stream, log them, and push them to the outgoing stream.
+   */
+  async transform(this: EyelingArgs & this): Promise<void> {
+    this.rulesAsString = await this.streamToString(this.rules);
+    this.dataAsStrings = [this.rulesAsString];
 
-        const sourcesAsStrings = await Promise.all(promises);
+    for (let i = 0; i < this.input.length; i++) {
+      const input = this.input[i];
 
-        const output = reason(
+      (async () => {
+        for await (const msg of input.strings()) {
+          this.logger.info("New data :" + msg);
+          this.dataAsStrings.push(msg);
+          const output = reason(
             {},
             {
-                sources: sourcesAsStrings,
+              sources: this.dataAsStrings,
             },
-        );
+          );
 
-        await this.writer.string(output);
-        await this.writer.close();
-    }
-
-    /**
-     * Function to start the production of data, starting the pipeline.
-     * This function is called after all processors are completely set up.
-     */
-    async produce(this: EyelingArgs & this): Promise<void> {}
-
-    async streamToEye(reader: Reader): Promise<string> {
-        let sourceAsString = "";
-
-        for await (const msg of reader.strings()) {
-            this.logger.info(msg);
-            sourceAsString += msg + "\n";
+          this.logger.info(output);
+          await this.writer.string(output);
         }
-
-        return sourceAsString;
+      })();
     }
+  }
+
+  /**
+   * Function to start the production of data, starting the pipeline.
+   * This function is called after all processors are completely set up.
+   */
+  async produce(this: EyelingArgs & this): Promise<void> {}
+
+  async streamToString(reader: Reader): Promise<string> {
+    let dataAsString = "";
+
+    for await (const msg of reader.strings()) {
+      this.logger.info(msg);
+      dataAsString += msg + "\n";
+    }
+
+    return dataAsString;
+  }
 }
