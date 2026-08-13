@@ -33,4 +33,10 @@ eyeling:EyelingProcessorTs rdfc:jsImplementationOf rdfc:Processor;
 				sh:name "writer";
 				sh:minCount 1;
 				sh:maxCount 1;
-    ].
+    ], [
+				sh:datatype xsd:string;
+				sh:path eyeling:writerFormat;
+				sh:name "writerFormat";
+				sh:minCount 0;
+				sh:maxCount 1;
+		].

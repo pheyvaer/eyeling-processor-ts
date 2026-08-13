@@ -33,8 +33,10 @@ Next, you add the processor to your pipeline configuration as follows:
 
 # Define and configure the processor
 <eyeling> a eyeling:EyelingProcessorTs;
-    rdfc:reader <data1>, <data2>, <rules>;
-    rdfc:writer <output>.
+    eyeling:rules <rules>;
+    eyeling:input <data1>, <data2>;
+    rdfc:writer <output>;
+    eyeling:writerFormat "text/turtle". # This is optional. The default is N-Triples.
 ```
 
 ## Development usage

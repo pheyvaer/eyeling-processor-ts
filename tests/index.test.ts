@@ -28,6 +28,7 @@ describe("Functional tests for the Eyeling processor", () => {
           rules: rulesReader,
           input: [inputReader],
           writer: outputWriter,
+          writerFormat: "text/turtle",
         },
         createLogger(),
       )
@@ -83,6 +84,7 @@ describe("Functional tests for the Eyeling processor", () => {
           rules: rulesReader,
           input: [inputReader],
           writer: outputWriter,
+          writerFormat: "text/turtle",
         },
         createLogger(),
       )
@@ -146,6 +148,7 @@ describe("Functional tests for the Eyeling processor", () => {
           rules: rulesReader,
           input: [inputReader1, inputReader2],
           writer: outputWriter,
+          writerFormat: "text/turtle",
         },
         createLogger(),
       )
@@ -183,6 +186,61 @@ describe("Functional tests for the Eyeling processor", () => {
       "@prefix : <http://example.org/> .\n" +
         "\n" +
         ":Socrates a :Mortal .\n:Sofia a :Mortal .\n",
+    ]);
+  });
+
+  test("Writer format is n-triples", async () => {
+    const runner = createRunner();
+
+    const [rulesWriter, rulesReader] = channel(runner, "rules");
+    const [inputWriter, inputReader] = channel(runner, "input");
+    const [outputWriter, outputReader] = channel(runner, "outgoing");
+
+    // Read output
+    const output: string[] = [];
+    (async () => {
+      for await (const msg of outputReader.strings()) {
+        output.push(msg);
+      }
+      return output;
+    })().then();
+
+    // Initialize the processor.
+    const startEyelingProcessor = <FullProc<EyelingProcessor>>(
+      new EyelingProcessor(
+        {
+          rules: rulesReader,
+          input: [inputReader],
+          writer: outputWriter,
+        },
+        createLogger(),
+      )
+    );
+
+    await startEyelingProcessor.init();
+
+    const outputPromise = Promise.all([
+      startEyelingProcessor.transform(),
+      startEyelingProcessor.produce(),
+    ]);
+
+    await rulesWriter.string(
+      "@prefix : <http://example.org/> . { ?x a :Person } => { ?x a :Mortal } .",
+    );
+    await rulesWriter.close();
+
+    // Push messages into input
+    await inputWriter.string(
+      "@prefix : <http://example.org/> . :Socrates a :Person .",
+    );
+
+    await inputWriter.close();
+    // Wait for the processor to finish.
+    await outputPromise;
+
+    // Assertions on output data
+    expect(output).toEqual([
+      "<http://example.org/Socrates> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/Mortal> .\n",
     ]);
   });
 

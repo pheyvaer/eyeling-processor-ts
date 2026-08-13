@@ -1,10 +1,12 @@
 import { Processor, type Reader, type Writer } from "@rdfc/js-runner";
 import { reason } from "eyeling";
+import N3 from "n3";
 
 export type EyelingArgs = {
   input: Array<Reader>;
   rules: Reader;
   writer: Writer;
+  writerFormat: string;
 };
 
 /**
@@ -23,7 +25,9 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
    * This is the first function that is called (and awaited) when creating a processor.
    * This is the perfect location to start things like database connections.
    */
-  async init(this: EyelingArgs & this): Promise<void> {}
+  async init(this: EyelingArgs & this): Promise<void> {
+    this.writerFormat = this.writerFormat ?? "N-triples";
+  }
 
   /**
    * Function to start reading channels.
@@ -41,7 +45,7 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
         for await (const msg of input.strings()) {
           this.logger.info("New data :" + msg);
           this.dataAsStrings.push(msg);
-          const output = reason(
+          let output = reason(
             {},
             {
               sources: this.dataAsStrings,
@@ -49,9 +53,14 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
           );
 
           this.logger.info(output);
+
+          if (this.writerFormat !== "text/turtle") {
+            output = await this.convertTurtle(output, this.writerFormat);
+          }
+
           await this.writer.string(output);
         }
-      })();
+      })().then();
     }
   }
 
@@ -70,5 +79,30 @@ export class EyelingProcessor extends Processor<EyelingArgs> {
     }
 
     return dataAsString;
+  }
+
+  convertTurtle(turtle: string, format: string): Promise<string> {
+    const parser = new N3.Parser();
+    const writer = new N3.Writer({ format });
+
+    return new Promise((resolve, reject) => {
+      parser.parse(turtle, (error, quad) => {
+        if (error) {
+          reject(error);
+        }
+
+        if (quad) {
+          writer.addQuad(quad);
+        } else {
+          writer.end((error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          });
+        }
+      });
+    });
   }
 }
