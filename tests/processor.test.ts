@@ -12,7 +12,7 @@ const pipeline = `
         <http://example.com/processor> a eyeling:EyelingProcessorTs;
           eyeling:rules <incoming1>;
           eyeling:input <incoming2>, <incoming3>;
-          rdfc:writer <outgoing>
+          rdfc:writer <outgoing>.
         `;
 
 describe("Eyeling processor tests", async () => {
