@@ -23,6 +23,7 @@
     "license": "MIT",
     "devDependencies": {
         "@rdfc/js-runner": "^3.2.0",
+        "@types/n3": "^1.26.1",
         "@types/node": "^26.1.2",
         "@typescript-eslint/eslint-plugin": "^8.65.0",
         "@typescript-eslint/parser": "^8.65.0",
@@ -32,13 +33,13 @@
         "eslint-config-prettier": "^10.1.8",
         "husky": "^9.1.7",
         "lint-staged": "^17.3.0",
+        "markdownlint-cli2": "^0.16.0",
         "n3": "^2.2.0",
         "prettier": "^3.9.6",
         "ts-node": "^10.9.2",
         "tsc-alias": "^1.9.1",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.10",
-        "markdownlint-cli2": "^0.16.0"
+        "vitest": "^4.1.10"
     },
     "dependencies": {
         "eyeling": "^2.35.4",

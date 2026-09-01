@@ -18,13 +18,25 @@ eyeling:EyelingProcessorTs rdfc:jsImplementationOf rdfc:Processor;
     sh:targetClass eyeling:EyelingProcessorTs;
     sh:property [
         sh:class rdfc:Reader;
-        sh:path rdfc:reader;
-        sh:name "reader";
-        sh:minCount 1;
-    ], [
-        sh:class rdfc:Writer;
-        sh:path rdfc:writer;
-        sh:name "writer";
+        sh:path eyeling:rules;
+        sh:name "rules";
         sh:minCount 1;
         sh:maxCount 1;
-    ].
+    ], [
+				sh:class rdfc:Reader;
+				sh:path eyeling:input;
+				sh:name "input";
+				sh:minCount 1;
+		], [
+				sh:class rdfc:Writer;
+				sh:path rdfc:writer;
+				sh:name "writer";
+				sh:minCount 1;
+				sh:maxCount 1;
+    ], [
+				sh:datatype xsd:string;
+				sh:path eyeling:writerFormat;
+				sh:name "writerFormat";
+				sh:minCount 0;
+				sh:maxCount 1;
+		].
