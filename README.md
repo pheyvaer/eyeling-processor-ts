@@ -39,6 +39,8 @@ Next, you add the processor to your pipeline configuration as follows:
     eyeling:writerFormat "text/turtle". # This is optional. The default is N-Triples.
 ```
 
+Note that reasoning only starts once the channel with the rules is closed.
+
 ## Development usage
 
 1. Install the dependencies via
