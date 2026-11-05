@@ -3,9 +3,9 @@
 [![Build and tests with Node.js](https://github.com/pheyvaer/eyeling-processor-ts/actions/workflows/build-test.yml/badge.svg)](https://github.com/pheyvaer/eyeling-processor-ts/actions/workflows/build-test.yml)
 
 TypeScript RDF-Connect processor for [Eyeling](https://github.com/eyereasoner/eyeling).
-It only supports Eyeling's [reason function](https://github.com/eyereasoner/eyeling/#reasonoptions-input) 
+It only supports Eyeling's [reason function](https://github.com/eyereasoner/eyeling/#reasonoptions-input)
 with [multi-source input](https://github.com/eyereasoner/eyeling/#multi-source-input).
-At the moment, the processor only supports the default options. 
+At the moment, the processor only supports the default options.
 
 ## Production usage
 
@@ -17,6 +17,7 @@ Next, you add the processor to your pipeline configuration as follows:
 
 ```turtle
 @prefix rdfc: <https://w3id.org/rdf-connect#>.
+@prefix rdfcp: <https://w3id.org/rdf-connect/processors#>.
 @prefix owl: <http://www.w3.org/2002/07/owl#>.
 
 # Import the processor
@@ -33,8 +34,8 @@ Next, you add the processor to your pipeline configuration as follows:
 
 # Define and configure the processor
 <eyeling> a eyeling:EyelingProcessorTs;
-    rdfc:reader <data1>, <data2>, <rules>;
-    rdfc:writer <output>.
+    rdfcp:input <data1>, <data2>, <rules>;
+    rdfcp:output <output>.
 ```
 
 ## Development usage
