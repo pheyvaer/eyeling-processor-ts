@@ -20,12 +20,14 @@ eyeling:EyelingProcessorTs rdfc:jsImplementationOf rdfc:Processor;
         sh:path rdfc:reader;
         sh:codeIdentifier "reader";
         sh:name "Input channels";
+        sh:description "Input channels with the N3 data and rules to reason over. Repeat for several channels; the reasoner runs once all of them are closed.";
         sh:minCount 1;
     ], [
         sh:class rdfc:Writer;
         sh:path rdfc:writer;
         sh:codeIdentifier "writer";
         sh:name "Output channel";
+        sh:description "Output channel to which the result of the reasoning is written.";
         sh:minCount 1;
         sh:maxCount 1;
     ].
