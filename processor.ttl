@@ -1,5 +1,6 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#>.
 @prefix rdfc: <https://w3id.org/rdf-connect#>.
+@prefix rdfcp: <https://w3id.org/rdf-connect/processors#>.
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 @prefix sh: <http://www.w3.org/ns/shacl#>.
 @prefix eyeling: <https://eyereasoner.github.io/eyeling#>.
@@ -17,14 +18,14 @@ eyeling:EyelingProcessorTs rdfc:jsImplementationOf rdfc:Processor;
     sh:targetClass eyeling:EyelingProcessorTs;
     sh:property [
         sh:class rdfc:Reader;
-        sh:path rdfc:reader;
+        sh:path rdfcp:input;
         sh:codeIdentifier "reader";
         sh:name "Input channels";
         sh:description "Input channels with the N3 data and rules to reason over. Repeat for several channels; the reasoner runs once all of them are closed.";
         sh:minCount 1;
     ], [
         sh:class rdfc:Writer;
-        sh:path rdfc:writer;
+        sh:path rdfcp:output;
         sh:codeIdentifier "writer";
         sh:name "Output channel";
         sh:description "Output channel to which the result of the reasoning is written.";

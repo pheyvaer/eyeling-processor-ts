@@ -7,11 +7,12 @@ import { EyelingArgs, EyelingProcessor } from "../src";
 
 const pipeline = `
         @prefix rdfc: <https://w3id.org/rdf-connect#>.
+        @prefix rdfcp: <https://w3id.org/rdf-connect/processors#>.
         @prefix eyeling: <https://eyereasoner.github.io/eyeling#>.
 
         <http://example.com/processor> a eyeling:EyelingProcessorTs;
-          rdfc:reader <incoming1>, <incoming2>;
-          rdfc:writer <outgoing>.
+          rdfcp:input <incoming1>, <incoming2>;
+          rdfcp:output <outgoing>.
         `;
 
 describe("Eyeling processor tests", async () => {
